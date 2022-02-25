@@ -31,7 +31,8 @@ const schema = yup.object().shape({
 });
 
 const Users = () => {
-  const { users, editUser, deleteUser } = useContext(usersContext);
+
+  const  { users, editUser, deleteUser } = useContext(usersContext);
 
   const { register, handleSubmit } = useForm({
     resolver: yupResolver(schema),
@@ -159,7 +160,8 @@ const Users = () => {
   };
 
   return (
-    <Container>
+    <Container data-testid="Users-test">
+  
       <Row>
         <Col md={6} className="d-flex pt-2">
           <PaginationComponent
@@ -184,7 +186,7 @@ const Users = () => {
           </div>
         </div>
       </Row>
-
+      <h1>Users</h1>
       <Form onSubmit={handleSubmit(submitForm)}>
         <Table className="text-center">
           <TableHeader

@@ -8,9 +8,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import styles  from "./styles.css"
-
-import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 

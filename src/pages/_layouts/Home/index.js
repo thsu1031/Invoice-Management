@@ -17,11 +17,16 @@ import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Dropdown from "react-bootstrap/Dropdown";
 import invoicesContext from "../../../context/invoices/invoices-context";
-import { createInvoiceAPI } from "../../../services/invoiceApi.js"
+import { createInvoiceAPI } from "../../../services/invoiceApi.js";
 import { useNavigate } from "react-router-dom";
 import { nanoid } from "nanoid";
 import AddUser from "../../../components/AddUser";
-
+import {
+  calculatePaid,
+  calculateUnPaid,
+  calculateOverdue,
+  calculateRevenue,
+} from "./dashboardCalculations";
 
 ChartJS.register(
   CategoryScale,
@@ -33,64 +38,7 @@ ChartJS.register(
   Legend
 );
 
-function calculatePaid(invoices) {
-  let paidTotal = 0
-  invoices.forEach((invoice) => {
-    if(invoice.isPaid === true) {
-      paidTotal++;
-    }
-  })
-  return paidTotal;
-}
-
-function calculateUnPaid(invoices) {
-  let unpaidTotal = 0
-  invoices.forEach((invoice) => {
-    if(invoice.isPaid === false) {
-      unpaidTotal++;
-    }
-  })
-  return unpaidTotal;
-}
-
-function calculateOverdue(invoices) {
-  let overdueTotal = 0;
-  const now = new Date();
-  const unix_now  = now.getTime()/1000;
-
-  invoices.forEach((invoice) => {
-    if(invoice.isPaid === false && invoice.dueDate < unix_now ) {
-      overdueTotal++;
-    }
-
-  })
-  return overdueTotal;
-}
-
-const calculateRevenue = (invoices) => {
-  if(!invoices.length) return;;
-  const revenue = new Array(12).fill(0);
-
-  for(let i = 0; i < invoices.length; i++) {
-    if(invoices[i].isPaid === false) continue;
-    if(!invoices[i].hasOwnProperty("lineItems")) continue;
-    if(!invoices[i].hasOwnProperty("dueDate")) continue;
-
-    const year  = new Date(invoices[i].dueDate*1000).getFullYear();
-    const month = new Date(invoices[i].dueDate*1000).getMonth();
-
-    if(year === 2022) {
-      let total = 0;
-      for (const [key, value] of Object.entries(invoices[i].lineItems)) {
-        total += value.quantity*value.price;
-      }
-      revenue[month] += total;
-    }
-  }
-  return revenue;
-};
-
-export const options = {
+const options = {
   responsive: true,
   plugins: {
     legend: {
@@ -103,15 +51,27 @@ export const options = {
   },
 };
 
-const labels = [["Jan", 2022], ["Feb", 2022], ["Mar", 2022], ["Apr", 2022], ["May", 2022], ["Jun", 2022], ["Jul", 2022], ["Aug", 2022], ["Sep",2022], ["Oct",2022], ["Nov", 2022], ["Dec",2022]];
+const labels = [
+  ["Jan", 2022],
+  ["Feb", 2022],
+  ["Mar", 2022],
+  ["Apr", 2022],
+  ["May", 2022],
+  ["Jun", 2022],
+  ["Jul", 2022],
+  ["Aug", 2022],
+  ["Sep", 2022],
+  ["Oct", 2022],
+  ["Nov", 2022],
+  ["Dec", 2022],
+];
 
 const Home = () => {
-
-  const {invoices, addInvoice } = useContext(invoicesContext)
-  const paid = useMemo(()=> calculatePaid(invoices), [invoices]);
-  const  unpaid =  useMemo(()=> calculateUnPaid(invoices), [invoices]);
-  const onverdue = useMemo(()=> calculateOverdue(invoices), [invoices]);
-  const lineChartData = useMemo(()=> calculateRevenue(invoices), [invoices]);
+  const { invoices, addInvoice } = useContext(invoicesContext);
+  const paid = useMemo(() => calculatePaid(invoices), [invoices]);
+  const unpaid = useMemo(() => calculateUnPaid(invoices), [invoices]);
+  const onverdue = useMemo(() => calculateOverdue(invoices), [invoices]);
+  const lineChartData = useMemo(() => calculateRevenue(invoices), [invoices]);
   const navigate = useNavigate();
 
   const data = {
@@ -161,28 +121,28 @@ const Home = () => {
       });
   }
   const [addNewUserFormVisibility, setAddNewUserFormVisibility] =
-  useState(false);
+    useState(false);
 
   const toggleAddUserFormVisibility = () =>
-  setAddNewUserFormVisibility((visibility) => !visibility);
-
-  
+    setAddNewUserFormVisibility((visibility) => !visibility);
 
   return (
-    <Container>
+    <Container data-testid="Home-test">
       <Row className="pt-3">
         <Dropdown>
-          <Dropdown.Toggle variant="success">
-           New
-          </Dropdown.Toggle>
+          <Dropdown.Toggle variant="success">New</Dropdown.Toggle>
           <Dropdown.Menu>
-            <Dropdown.Item onClick={callAddInvoiceAPI}>New Invoice</Dropdown.Item>
-            <Dropdown.Item onClick={toggleAddUserFormVisibility}>Add User</Dropdown.Item>
+            <Dropdown.Item onClick={callAddInvoiceAPI}>
+              New Invoice
+            </Dropdown.Item>
+            <Dropdown.Item onClick={toggleAddUserFormVisibility}>
+              Add User
+            </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       </Row>
       <Row className="pt-3">
-        <Col className="tile-padding"  md={3} xs={12}>
+        <Col className="tile-padding" md={3} xs={12}>
           <Card border="success">
             <Card.Body>
               <Card.Title>Total invoice</Card.Title>
@@ -190,7 +150,7 @@ const Home = () => {
             </Card.Body>
           </Card>
         </Col>
-        <Col className="tile-padding" md={3}  xs={12}>
+        <Col className="tile-padding" md={3} xs={12}>
           <Card border="warning">
             <Card.Body>
               <Card.Title>Overdue</Card.Title>
@@ -198,7 +158,7 @@ const Home = () => {
             </Card.Body>
           </Card>
         </Col>
-        <Col className="tile-padding" md={3}  xs={12}>
+        <Col className="tile-padding" md={3} xs={12}>
           <Card border="success">
             <Card.Body>
               <Card.Title>Paid</Card.Title>

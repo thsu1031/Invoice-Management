@@ -1,4 +1,4 @@
-import React, { useState, useMemo,  useContext} from "react";
+import React, { useState, useMemo, useContext } from "react";
 import {
   TableHeader,
   Search,
@@ -79,8 +79,9 @@ const Invoices = () => {
           (invoice.hasOwnProperty("dueDate") &&
             timeConverter(invoice.dueDate)
               .toLowerCase()
-              .includes(search.toLowerCase())) || 
-          (invoice.hasOwnProperty("id") && invoice.id.toLowerCase().includes(search.toLocaleLowerCase()))
+              .includes(search.toLowerCase())) ||
+          (invoice.hasOwnProperty("id") &&
+            invoice.id.toLowerCase().includes(search.toLocaleLowerCase()))
       );
     }
 
@@ -145,7 +146,7 @@ const Invoices = () => {
           const message = `An error has occured: ${result.status}`;
           throw new Error(message);
         }
-        
+
         addInvoice(newInvoice);
         navigate(`/invoices/${id}`);
       })
@@ -155,7 +156,7 @@ const Invoices = () => {
   }
 
   return (
-    <Container>
+    <Container data-testid="Invoices-test">
       <Row>
         <Col md={6} className="d-flex pt-2">
           <PaginationComponent
@@ -179,54 +180,55 @@ const Invoices = () => {
             </Button>
           </div>
         </div>
-        <Table responsive>
-          <TableHeader
-            className="table align-middle"
-            headers={headers}
-            onSorting={(field, order) => {
-              setSorting({ field, order });
-            }}
-          />
-          <tbody>
-            {invoicesData.map((invoice) => (
-              <tr key={invoice.id}>
-                <th scope="row">{invoice.id}</th>
-                <td>{invoice.customerName}</td>
-                <td>{invoice.title}</td>
-                <td>{timeConverter(invoice.dueDate)}</td>
-                <td>
-                  {invoice.isPaid === true ? (
-                    <span className="badge bg-primary">Paid</span>
-                  ) : (
-                    <span className="badge bg-danger">Unpaid</span>
-                  )}
-                </td>
-                <td>
-                  <Link to={`/invoices/${invoice.id}`}>
-                    <Button
-                      className="action-button"
-                      size="sm"
-                      type="button"
-                      key={invoice.id}
-                      to={`/invoices/${invoice.id}`}
-                    >
-                      <FontAwesomeIcon icon={faEdit}></FontAwesomeIcon>
-                    </Button>
-                  </Link>
+      </Row>
+      <h1>Invices</h1>
+      <Table responsive>
+        <TableHeader
+          className="table align-middle"
+          headers={headers}
+          onSorting={(field, order) => {
+            setSorting({ field, order });
+          }}
+        />
+        <tbody>
+          {invoicesData.map((invoice) => (
+            <tr key={invoice.id}>
+              <th scope="row">{invoice.id}</th>
+              <td>{invoice.customerName}</td>
+              <td>{invoice.title}</td>
+              <td>{timeConverter(invoice.dueDate)}</td>
+              <td>
+                {invoice.isPaid === true ? (
+                  <span className="badge bg-primary">Paid</span>
+                ) : (
+                  <span className="badge bg-danger">Unpaid</span>
+                )}
+              </td>
+              <td>
+                <Link to={`/invoices/${invoice.id}`}>
                   <Button
                     className="action-button"
                     size="sm"
                     type="button"
-                    onClick={() => clickDeleteHandler(invoice.id)}
+                    key={invoice.id}
+                    to={`/invoices/${invoice.id}`}
                   >
-                    <FontAwesomeIcon icon={faTrash}></FontAwesomeIcon>
+                    <FontAwesomeIcon icon={faEdit}></FontAwesomeIcon>
                   </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      </Row>
+                </Link>
+                <Button
+                  className="action-button"
+                  size="sm"
+                  type="button"
+                  onClick={() => clickDeleteHandler(invoice.id)}
+                >
+                  <FontAwesomeIcon icon={faTrash}></FontAwesomeIcon>
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
     </Container>
   );
 };

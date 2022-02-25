@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useMemo, useContext } from "react";
-import {
-  TableHeader,
-  Search
-} from "../../components/DataTable/index";
+import { TableHeader, Search } from "../../components/DataTable/index";
 import { useParams } from "react-router-dom";
 import { API_INVOICES } from "../../global/constants";
 import AutoComplete from "../../components/AutoComplete";
@@ -77,11 +74,7 @@ const Invoice = () => {
   const { users } = useContext(usersContext);
   const { invoices, editInvoice } = useContext(invoicesContext);
 
-  
-  const {
-    register,
-    handleSubmit
-  } = useForm({
+  const { register, handleSubmit } = useForm({
     resolver: yupResolver(schema),
   });
 
@@ -92,7 +85,7 @@ const Invoice = () => {
       zipcode: "zipcode",
     },
   });
- 
+
   const [inputUser, setInputUser] = useState({
     address: {
       street: "street",
@@ -124,17 +117,21 @@ const Invoice = () => {
   const [total, setTotal] = useState(0);
 
   const headers = [
-    {name: "No#",  field: "id", sortable: false, type: "string"},
-    {name: "Description", field: "description", sortable: true, type:"string"},
-    {name:"Quantity", field: "quantity", sortable: true, type: "number"},
-    {name:"Price", field: "price", sortable: true, type:"number"},
-    {name: "Actions", field: "actions", sortable: false, type: null}
+    { name: "No#", field: "id", sortable: false, type: "string" },
+    {
+      name: "Description",
+      field: "description",
+      sortable: true,
+      type: "string",
+    },
+    { name: "Quantity", field: "quantity", sortable: true, type: "number" },
+    { name: "Price", field: "price", sortable: true, type: "number" },
+    { name: "Actions", field: "actions", sortable: false, type: null },
   ];
 
   const [search, setSearch] = useState("");
-  const [sorting, setSorting] = useState({ field: "", order: ""})
+  const [sorting, setSorting] = useState({ field: "", order: "" });
   const [totalItems, setTotalItems] = useState("");
-
 
   function titleChange(e) {
     setTitle(e.target.value);
@@ -145,7 +142,6 @@ const Invoice = () => {
   }
 
   function customerNameSelect(customer) {
-
     callUpdateInvoiceAPI({
       customerName: customer.name,
       customerPhone: customer.phone,
@@ -159,31 +155,33 @@ const Invoice = () => {
     });
   }
 
-
   function createDateChange(e) {
     setCreateDate(e.target.value);
   }
 
   function createDateSelect() {
-    const splitDate = createDate.split('-');
-    const year = +splitDate[0]
-    const month  = +(splitDate[1]-1)
-    const date = +splitDate[2]
-    callUpdateInvoiceAPI({ createDate: Math.floor(new Date(year, month, date).getTime() / 1000) });
+    const splitDate = createDate.split("-");
+    const year = +splitDate[0];
+    const month = +(splitDate[1] - 1);
+    const date = +splitDate[2];
+    callUpdateInvoiceAPI({
+      createDate: Math.floor(new Date(year, month, date).getTime() / 1000),
+    });
   }
 
   function dueDateChange(e) {
     setDueDate(e.target.value);
   }
 
-  function dueDateSelect() { 
-  const splitDate = dueDate.split('-');
-  const year = +splitDate[0]
-  const month  = +(splitDate[1]-1)
-  const date = +splitDate[2]
-  callUpdateInvoiceAPI({ dueDate: Math.floor(new Date(year, month, date).getTime() / 1000) });
+  function dueDateSelect() {
+    const splitDate = dueDate.split("-");
+    const year = +splitDate[0];
+    const month = +(splitDate[1] - 1);
+    const date = +splitDate[2];
+    callUpdateInvoiceAPI({
+      dueDate: Math.floor(new Date(year, month, date).getTime() / 1000),
+    });
   }
-
 
   function isPaidChange(e) {
     setIsPaid(e.target.value);
@@ -219,21 +217,18 @@ const Invoice = () => {
 
         editInvoice(update);
         cb();
-        
       })
       .catch((error) => {
         console.log(`error in updating invoice`, error);
       });
   }
 
-
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         const invoiceResponse = await fetch(`${API_INVOICES}/${slug}`);
         const invoiceJson = await invoiceResponse.json();
-    
+
         setInvoice(invoiceJson);
         setFlattenedLineItems(flattenLineItems(invoiceJson));
         setTotal(calculateTotal(flattenLineItems(invoiceJson)));
@@ -250,36 +245,36 @@ const Invoice = () => {
     fetchData();
   }, [slug, invoices]);
 
-  const lineItemsData = useMemo(()=> {
+  const lineItemsData = useMemo(() => {
     let computedLineItems = flattenedLineItems;
     setTotalItems(computedLineItems.length);
 
-    if(search) {
+    if (search) {
       computedLineItems = computedLineItems.filter(
-        (item) =>  
-        item.description.toLowerCase().includes(search.toLowerCase()) ||
-        item.quantity.toString().includes(search.toLowerCase()) || 
-        item.price.toString().includes(search.toLowerCase())
+        (item) =>
+          item.description.toLowerCase().includes(search.toLowerCase()) ||
+          item.quantity.toString().includes(search.toLowerCase()) ||
+          item.price.toString().includes(search.toLowerCase())
       );
     }
 
-    if(sorting.field) {
+    if (sorting.field) {
       const reversed = sorting.order === "asc" ? 1 : -1;
       computedLineItems = computedLineItems.sort((a, b) => {
-
-        if(typeof a[sorting.field]  === "number")
-            return reversed*(a[sorting.field] - b[sorting.field])
-        else 
+        if (typeof a[sorting.field] === "number")
+          return reversed * (a[sorting.field] - b[sorting.field]);
+        else
           return (
-          reversed*
-          a[sorting.field].toString().localeCompare(b[sorting.field].toString()))
-        
-      })
+            reversed *
+            a[sorting.field]
+              .toString()
+              .localeCompare(b[sorting.field].toString())
+          );
+      });
     }
 
     return computedLineItems;
-
-  }, [sorting, flattenedLineItems, search])
+  }, [sorting, flattenedLineItems, search]);
 
   const clickEditHandler = (event, item) => {
     event.preventDefault();
@@ -310,11 +305,10 @@ const Invoice = () => {
       price: item.price,
     };
 
-    const copyLineItems =  _.cloneDeep(invoice.lineItems)
+    const copyLineItems = _.cloneDeep(invoice.lineItems);
     const updateLineItem = { ...copyLineItems, ...editedLineItem };
 
-    callUpdateInvoiceAPI({'lineItems' : updateLineItem})
-
+    callUpdateInvoiceAPI({ lineItems: updateLineItem });
   };
 
   const clickDeleteHandler = (item) => {
@@ -322,9 +316,9 @@ const Invoice = () => {
   };
 
   function deleteLineItem(id) {
-    const copyLineItems = _.cloneDeep(invoice.lineItems)
+    const copyLineItems = _.cloneDeep(invoice.lineItems);
     delete copyLineItems[id];
-    callUpdateInvoiceAPI({"lineItems": copyLineItems })
+    callUpdateInvoiceAPI({ lineItems: copyLineItems });
   }
 
   const clickCancelHandler = (event) => {
@@ -334,7 +328,8 @@ const Invoice = () => {
 
   return (
     <>
-      <Container>
+      <Container data-testid="Invoice-test">
+        <h1 className="pt-3">Invoice Details ({invoiceId})</h1>
         <Row className="mb-3 pt-3">
           <Col sm={1}>
             <Form.Label htmlFor="title">Title</Form.Label>
@@ -351,9 +346,7 @@ const Invoice = () => {
         </Row>
         <Row className="mb-3">
           <Col sm={1}>
-            <Form.Label>
-              Customer
-            </Form.Label>
+            <Form.Label>Customer</Form.Label>
           </Col>
           <Col sm={5}>
             <div className="search-bar-container">
@@ -397,10 +390,7 @@ const Invoice = () => {
                 <Form.Label>Status</Form.Label>
               </Col>
               <Col sm={5}>
-                <Form.Select
-                  onChange={isPaidChange}
-                  value={invoice.isPaid}
-                >
+                <Form.Select onChange={isPaidChange} value={invoice.isPaid}>
                   <option value="true">Paid</option>
                   <option value="false">Unpaid</option>
                 </Form.Select>
@@ -428,9 +418,7 @@ const Invoice = () => {
           <Col sm={6}>
             <Row className="mb-3">
               <Col sm={3}>
-                <Form.Label>
-                  Due Date
-                </Form.Label>
+                <Form.Label>Due Date</Form.Label>
               </Col>
               <Col sm={5}>
                 <Form.Control
@@ -448,22 +436,22 @@ const Invoice = () => {
         <Row>
           <Col sm={10}></Col>
           <Col sm={2}>
-          <Search
-            onSearch={(value) => {
-              setSearch(value);
-            }}
-          />
+            <Search
+              onSearch={(value) => {
+                setSearch(value);
+              }}
+            />
           </Col>
         </Row>
         <Row>
           <Form onSubmit={handleSubmit(submitForm)}>
             <Table className="text-center">
               <TableHeader
-                  className="table"
-                  headers={headers}
-                  onSorting={(field, order) => {
-                    setSorting({ field, order });
-                  }}
+                className="table"
+                headers={headers}
+                onSorting={(field, order) => {
+                  setSorting({ field, order });
+                }}
               />
               <tbody>
                 <EditableTable
@@ -489,9 +477,7 @@ const Invoice = () => {
         <br />
         <Row className="mb-3">
           <Col sm={1}>
-            <Form.Label>
-              Notes
-            </Form.Label>
+            <Form.Label>Notes</Form.Label>
           </Col>
           <Col sm={5}>
             <textarea

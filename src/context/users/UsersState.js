@@ -48,6 +48,8 @@ const UsersState = (props) => {
     });
   };
 
+  // console.log(state.users)
+
   return (
     <UsersContext.Provider
       value={{
@@ -66,3 +68,6 @@ const UsersState = (props) => {
 export const useUsers = () => useContext(UsersContext);
 
 export default UsersState;
+
+
+
