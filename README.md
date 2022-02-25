@@ -26,10 +26,10 @@ Client
 * Chart.js
 
 Server 
-* Json Server 
+* JSON Server
 
 ## Demo Development 
-## Installing
+### Installing
 Clone and install. 
 
 ```
@@ -38,7 +38,7 @@ npm i
 
 ```
 
-## Running the tests 
+### Running the tests 
 ```
 npm run test
 ```
