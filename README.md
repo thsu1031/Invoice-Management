@@ -33,7 +33,7 @@ Server
 Clone and install. 
 
 ```
-https://github.com/thsu1031/Invoice-Management.git
+git clone https://github.com/thsu1031/Invoice-Management.git
 npm i
 
 ```
